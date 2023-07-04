@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='gcrnet',
-      version='1.0.0',
+      version='1.0.1',
       author="Bin Luo",
       author_email="bin.luo2@duke.edu",
       description="A Python library for sparse-input neural networks using group concave regularization",
