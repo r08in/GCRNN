@@ -2,9 +2,9 @@ import torch.nn as nn
 import torch
 import numpy as np
 
-from gcrnn.mlp import MLPModel
-from gcrnn.losses import PartialLogLikelihood
-from gcrnn.penalty import *
+from gcrnet.mlp import MLPModel
+from gcrnet.losses import PartialLogLikelihood
+from gcrnet.penalty import *
 
 
 

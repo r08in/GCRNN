@@ -1,5 +1,5 @@
 import torch.nn as nn
-from gcrnn.utils import get_activation
+from gcrnet.utils import get_activation
 
 __all__ = [
     'MLPLayer', 'MLPModel'

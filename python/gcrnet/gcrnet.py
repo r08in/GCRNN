@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import copy
 from sklearn.metrics import r2_score
-from gcrnn.models import  ConcaveRegularMLPCoxModel, ConcaveRegularMLPRegressionModel, ConcaveRegularMLPClassificationModel
-from gcrnn.utils import Meters, get_optimizer, as_float, as_numpy, FastTensorDataLoader, nanargmax_safe, get_model_size, get_param_combination, _standard_truncnorm_sample
-from gcrnn.losses import calc_concordance_index, PartialLogLikelihood
+from gcrnet.models import  ConcaveRegularMLPCoxModel, ConcaveRegularMLPRegressionModel, ConcaveRegularMLPClassificationModel
+from gcrnet.utils import Meters, get_optimizer, as_float, as_numpy, FastTensorDataLoader, nanargmax_safe, get_model_size, get_param_combination, _standard_truncnorm_sample
+from gcrnet.losses import calc_concordance_index, PartialLogLikelihood
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator
 import numpy as np
@@ -13,15 +13,35 @@ import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
 
 
-__all__ = ['GCRNN']
+__all__ = ['gcrnet']
 
 
 
-class GCRNN(BaseEstimator):
+class GCRNet(BaseEstimator):
     def __init__(self, device, input_dim, output_dim=1, hidden_dims=[10,5], activation='relu', 
-                penalty=None, lam=[0], alpha=0,
-                optimizer='Adam', learning_rate=0.01,  batch_size=100, weight_decay=0, 
+                penalty=None, lam=0, alpha=0,
+                optimizer='Adam', learning_rate=0.001,  batch_size=100, weight_decay=0, 
                 task_type='cox', drop_input=False, extra_args=None):
+        """
+        Constructs a GCRNet model.
+
+        Parameters:
+            device (torch.device): The device on which the model will be trained (e.g., torch.device("cpu") or torch.device("cuda")).
+            input_dim (int): The input dimension of the model.
+            output_dim (int): The output dimension of the model (default: 1).
+            hidden_dims (list): The list of hidden layer dimensions (default: [10, 5]).
+            activation (str): The activation function to use in the hidden layers (default: 'relu').
+            penalty (None or str): The type of penalty to apply ('LASSO', 'MCP' or 'SCAD', default: None).
+            lam (float or list): The regularization parameter(s) for concave regularization (default: 0).
+            alpha (float): The alpha parameter for ridge regularization (default: 0).
+            optimizer (str): The optimizer to use for training (default: 'Adam').
+            learning_rate (float): The learning rate for the optimizer (default: 0.001).
+            batch_size (int): The batch size for training (default: 100).
+            weight_decay (float): The weight decay for the optimizer (default: 0).
+            task_type (str): The type of task to perform ('cox', 'regression', or 'classification', default: 'cox').
+            drop_input (bool): Whether to drop input features (dimension pruning) along the solution path based on dimen(default: False).
+            extra_args (None or dict): Extra arguments to be passed to the model (default: None).
+        """
         self.batch_size = batch_size
         self.activation = activation
         self.device = device
@@ -333,6 +353,23 @@ class GCRNN(BaseEstimator):
 
 
     def fit_and_validate(self, X, y, param_grid, test_size=0.2, n_jobs=None, nmin_features=None, nmax_features=None, **kwargs):
+        """
+        Randomly split data into training and validation sets. Then fit the GCRNet model to the training data and validate on the validation set.
+
+        Args:
+            X (array-like): The input training data of shape (n_samples, n_features).
+            y (array-like): The target training data of shape (n_samples,) for regression and classification or (n_samples, 2) for survival analysis.
+            param_grid (dict): The grid of hyperparameters to search during model training.
+            test_size (float): The proportion of the dataset to include in the validation split. The default value is 0.2, indicating a 20% validation split. 
+            n_jobs (int or None): The argument controls the parallel execution of the model fitting process, allowing multiple jobs to run simultaneously. Setting n_jobs to an integer value greater than 1 enables parallel execution. 
+                The default value is None, meaning that only one job will run during model fitting.
+            nmin_features (int or None): The minimum number of features to be selected. If None, there is no lower limit for feature selection. The default value is None.
+            nmax_features (int or None): The maximum number of features to be selected. If None, there is no upper limit for feature selection. The default value is None.
+
+        Returns:
+            self (object): The best fitted GCRNet model based on the evaluation metric.
+        """
+
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random.randint(0, 100))
         param_list = get_param_combination(param_grid)
         if n_jobs is not None: 
