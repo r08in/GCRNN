@@ -50,6 +50,7 @@ Some of our codebase and its structure are inspired by https://github.com/runopt
 
 If you find our library useful in your research, please consider citing us:
 
+```
 @misc{luo2023sparseinput,
       title={Sparse-Input Neural Network using Group Concave Regularization}, 
       author={Bin Luo and Susan Halabi},
@@ -58,3 +59,4 @@ If you find our library useful in your research, please consider citing us:
       archivePrefix={arXiv},
       primaryClass={stat.ML}
 }
+```
