@@ -37,12 +37,17 @@ param_grid={"alpha":[0.03]}
 gmcp_net= gmcp_net.fit_and_validate(X=train_data['X'], y=train_data['y'], 
                               param_grid=param_grid, init_num_epochs=2000, num_epochs=200, verbose=True, print_interval=200)
 ```
-
-For more details, please see our Colab notebooks:
+### Regression/Classification/Survival Examples
+Please see the examples in our Colab notebooks:
 
 - [Regression example](https://colab.research.google.com/github/r08in/GCRNN/blob/main/python/examples/Regression-example.ipynb)
 - [Classification example](https://colab.research.google.com/github/r08in/GCRNN/blob/main/python/examples/Classification-example.ipynb)
 - [Cox example](https://colab.research.google.com/github/r08in/GCRNN/blob/main/python/examples/Cox-example.ipynb)
+
+### Multivariate Survival Analysis Example
+We extend our framework to simultaneously select common variables and estimate models for multivariate failure time data. Our approach employs the penalized pseudo-partial likelihood method within a non-linear marginal hazard model. Specifically, each marginal hazard function is approximated by a feed-forward neural network with an identical input layer. We treat all outgoing connections from a single input neuron across feed-forward neural networks as a collective group and apply a concave penalty to the  l_2  norm of the weights within each group. By shrinking the weights of specific groups to exact zeros, our method yields a collection of neural networks that utilize only a concise subset of common variables. This group-level penalization facilitates the inclusion or exclusion of entire groups of parameters, enabling the identification of common variables relevant to multivariate failure time data.
+See the example in our Colab notebooks:
+- [Bivariate Cox example](https://colab.research.google.com/github/r08in/GCRNN/blob/main/python/examples/Bivariate-Cox-example.ipynb)
 
 ### Acknowledgements and References
 
