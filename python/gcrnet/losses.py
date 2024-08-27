@@ -9,23 +9,16 @@ def PartialLogLikelihood(logits, fail_indicator, ties):
     ties: 'noties' or 'efron' or 'breslow'
     '''
     logL = 0
-    # pre-calculate cumsum
-    max_logit = torch.max(logits)
-    logits2=logits - max_logit
-    hazard_ratio = torch.exp(logits2)
-    cumsum_hazard_ratio = torch.cumsum(hazard_ratio, 0)
     if ties == 'noties':
-        log_risk = torch.log(cumsum_hazard_ratio)
-        likelihood = logits - log_risk-max_logit
+        likelihood = logits - torch.logcumsumexp(logits, dim=0)
         # dimension for E: np.array -> [None, 1]
-        uncensored_likelihood = likelihood * fail_indicator
+        uncensored_likelihood = likelihood.squeeze() * fail_indicator.squeeze()
         logL = -torch.sum(uncensored_likelihood)
     else:
         raise NotImplementedError()
     # negative average log-likelihood
     observations = torch.sum(fail_indicator, 0)
     return 1.0*logL / observations
-
 
 
 def calc_concordance_index(logits, fail_indicator, fail_time):

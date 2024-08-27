@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np 
+from scipy.stats import uniform
 import six
 import collections
 import copy
@@ -292,3 +293,66 @@ def simulate_data(n_samples, n_features, scale=2, shape=2, data_type="cox", cens
         p = 1/(1+np.exp(-u))
         y = np.random.binomial(1,p=p)
         return dict(X=X, y=y.flatten())
+    
+
+def simulate_bivariate_cox_data(n_samples, n_features, scale=2, shape=2, censoring_rate=0.1,
+ times_distribution="weibull", case="LN", theta=2):
+    """  n_samples=10
+        n_features=5
+        scale=0.5
+        shape=0.5
+        censoring_factor=2
+        times_distribution="weibull" """  
+    pnum = 5
+    mu=np.zeros(n_features)
+    cov=np.diag(np.ones(n_features))
+    X=np.random.multivariate_normal(mean=mu, cov=cov, size=n_samples)
+    if case=="NL1":
+        u= 3*X[:,0]+5*X[:,1]**2 +4*X[:,0]*X[:,1]+ X[:,2]**2 + 3*X[:,3] + 5* X[:,3]*X[:,4]
+        u2=3*X[:,2]+2*X[:,1] +4*X[:,2]*X[:,1]+ X[:,0]**2 + 5*X[:,4] + 3* X[:,4]*X[:,3]
+    elif case == "NL2":
+        u= X[:,0] + X[:,1]* X[:,0]+ np.log(np.abs(X[:,1])+0.1)+np.exp(X[:,2]+X[:,3]) + X[:,4]**2 
+        u2=X[:,0]**2 + 4*X[:,1]+ X[:,1]*X[:,2] + 3*np.log(np.abs(X[:,2])+0.5) + 2*np.exp(X[:,3]+X[:,4])
+    elif case == "LN":
+        beta = np.array([0.729,  0.493,   0.200, -1.625,  -1.081])
+        beta2 = np.array([0.701, -1.095,  0.435,  0.080,  0.053])
+        u = np.dot(X[:,range(pnum)], beta)
+        u2 = np.dot(X[:,range(pnum)], beta2)
+
+    # Generate random uniform samples U1 and U2
+    U1 = uniform.rvs(size=n_samples)
+    V2 = uniform.rvs(size=n_samples)
+
+    # Apply the inverse Clayton copula CDF to get copula-based samples
+    U2=(U1**(-theta)*(V2**(-theta/(1+theta))-1)+1)**(-1/theta)
+
+    # Simulation of true times for first outcome
+    E=-np.log(1 - U1)
+    #E = np.random.exponential(scale=1., size=n_samples)
+    E *= np.exp(-u)
+    if times_distribution == "weibull":
+        T = (E / scale ) ** (1. / shape)
+    else:
+        # There is not point in this test, but let's do it like that
+        # since we're likely to implement other distributions
+        T = (E / scale ) ** (1. / shape)
+    censor_index = sample(range(n_samples), int(n_samples * censoring_rate))
+    t=copy.deepcopy(T) 
+    t[censor_index] = np.random.uniform(0, T[censor_index])
+    e=(T==t)
+
+    # Simulation of true times for second outcome
+    E2=-np.log(1 - U2)
+    #E2 = np.random.exponential(scale=1., size=n_samples)
+    E2 *= np.exp(-u2)
+    if times_distribution == "weibull":
+        T2 = (E2 / scale ) ** (1. / shape)
+    else:
+        # There is not point in this test, but let's do it like that
+        # since we're likely to implement other distributions
+        T2 = (E2 / scale ) ** (1. / shape)
+    censor_index = sample(range(n_samples), int(n_samples * censoring_rate))
+    t2=copy.deepcopy(T2) 
+    t2[censor_index] = np.random.uniform(0, T2[censor_index])
+    e2=(T2==t2)
+    return dict(X=X, T=t, E=e, T2=t2, E2=e2)

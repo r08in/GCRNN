@@ -21,29 +21,31 @@ def GroupSoftThresh(z, lam):
     '''
     return z * prox_plus(1-lam/torch.norm(z, p=2))
 
-def GMCP_op(z, lam, gamma=3):
+def GMCP_op(z, lam, gamma, a=3):
     '''
     z:vector of parameters
     lam: tuning parameter of penalty term
-    gamma: extra tuning parameter. Default is 3.
+    gamma: learnng rate
+    a: extra tuning parameter. Default is 3.
     '''
     z_norm = torch.norm(z, p=2)
-    if (z_norm <= gamma*lam):
-        return gamma/(gamma-1) * GroupSoftThresh(z, lam)
+    if (z_norm <= a*lam):
+        return a/(a-gamma) * GroupSoftThresh(z, gamma*lam)
     else:
         return z
 
-def GSCAD_op(z, lam, gamma=3.7):
+def GSCAD_op(z, lam, gamma, a=3.7):
     '''
     z:vector of parameters
     lam: tuning parameter of penalty term
-    gamma: extra tuning parameter. Default is 3.7.
+    gamma: learning rate
+    a: extra tuning parameter. Default is 3.7.
     '''
     z_norm = torch.norm(z, p=2)
-    if (z_norm <= 2*lam):
-        return  GroupSoftThresh(z, lam)
-    elif 2*lam < z_norm and z_norm <= gamma * lam:
-        return (gamma-1)/(gamma-2) * GroupSoftThresh(z, (gamma*lam)/(gamma-1))
+    if z_norm <= (1+gamma)*lam:
+        return  GroupSoftThresh(z, gamma*lam)
+    elif (1+gamma)*lam < z_norm and z_norm <= a * lam:
+        return (a-1)/(a-1-gamma) * GroupSoftThresh(z, (a*gamma*lam)/(a-1))
     else:
         return z
 
@@ -59,17 +61,17 @@ def MCP(u, lam, gamma=3):
     else:
         return gamma * lam**2/2
 
-def MCP_D1(u, lam, gamma=3):
-    '''
-    calculate the first derivative of MCP penalty
-    u: a non-negative scalar
-    lam: tuning parameter of penalty term
-    gamma: extra tuning parameter. Default is 3.
-    '''
-    if (u <= gamma * lam):
-        return (lam - u/gamma)
-    else:
-        return 0
+# def MCP_D1(u, lam, gamma=3):
+#     '''
+#     calculate the first derivative of MCP penalty
+#     u: a non-negative scalar
+#     lam: tuning parameter of penalty term
+#     gamma: extra tuning parameter. Default is 3.
+#     '''
+#     if (u <= gamma * lam):
+#         return (lam - u/gamma)
+#     else:
+#         return 0
 
 def SCAD(u, lam, gamma=3.7):
     '''
@@ -85,30 +87,30 @@ def SCAD(u, lam, gamma=3.7):
     else:
         return lam**2 * (gamma**2-1)/(2*(gamma-1))
 
-def SCAD_D1(u, lam, gamma=3.7):
-    '''
-    calculate the first derivative of SCAD penalty
-    u: a non-negative scalar
-    lam: tuning parameter of penalty term
-    gamma: extra tuning parameter. Default is 3.7.
-    '''
-    if(u <= lam):
-        return lam
-    elif (lam < u and u <= gamma * lam):
-        return (gamma * lam - u) / (gamma-1)
-    else:
-        return 0
+# def SCAD_D1(u, lam, gamma=3.7):
+#     '''
+#     calculate the first derivative of SCAD penalty
+#     u: a non-negative scalar
+#     lam: tuning parameter of penalty term
+#     gamma: extra tuning parameter. Default is 3.7.
+#     '''
+#     if(u <= lam):
+#         return lam
+#     elif (lam < u and u <= gamma * lam):
+#         return (gamma * lam - u) / (gamma-1)
+#     else:
+#         return 0
 
 
-def ConcaveSoftThresh(z, lam, outer_penalty, inner_penalty):
+def ConcaveSoftThresh(z, lam, gamma, outer_penalty, inner_penalty):
     if inner_penalty == "l2":
         lam = lam * math.sqrt(z.size(0))
         if outer_penalty == "MCP":
-            return GMCP_op(z, lam)
+            return GMCP_op(z, lam, gamma)
         elif outer_penalty == "SCAD":
-            return GSCAD_op(z, lam)
+            return GSCAD_op(z, lam, gamma)
         elif outer_penalty == "LASSO":
-            return GroupSoftThresh(z, lam)
+            return GroupSoftThresh(z, gamma*lam)
         else:
             raise ValueError('Unknown outer penalty function: {}.'.format(outer_penalty))
     elif inner_penalty == "l1":
