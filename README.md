@@ -1,6 +1,6 @@
 # GCRNet: Sparse-Input Neural Networks with Group Concave Regularization
 
-[Project Page](https://github.com/r08in/GCRNN)|[Paper](https://arxiv.org/abs/2307.00344)
+[Project Page](https://github.com/r08in/GCRNN)
 
 GCRNet is a Python library that implements a novel framework for sparse-input neural networks using group concave regularization. Leveraging the power of concave penalties, specifically MCP and SCAD, GCRNet provides a comprehensive approach for simultaneous feature selection and non-linear function estimation. The proposed framework considers all outgoing connections from a single input neuron as a group and applies an appropriate concave penalty to the $l_2$ norm of weights within each group. By selectively shrinking the weights of certain groups to exact zeros, GCRNet constructs a neural network that utilizes only a small subset of variables, enhancing both the accuracy and interpretability of the feature selection process. GCRNet offers versatile functionality, supporting regression or classification tasks with continuous, binary, or time-to-event outcomes.
 
@@ -53,15 +53,4 @@ See the example in our Colab notebooks:
 
 Some of our codebase and its structure are inspired by https://github.com/runopti/stg. 
 
-If you find our library useful in your research, please consider citing us:
-
-```
-@misc{luo2023sparseinput,
-      title={Sparse-Input Neural Network using Group Concave Regularization}, 
-      author={Bin Luo and Susan Halabi},
-      year={2023},
-      eprint={2307.00344},
-      archivePrefix={arXiv},
-      primaryClass={stat.ML}
-}
-```
+Citation information will be added after peer review.
