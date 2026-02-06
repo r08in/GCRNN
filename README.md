@@ -56,4 +56,16 @@ See the example in our Colab notebooks:
 
 Some of our codebase and its structure are inspired by https://github.com/runopti/stg. 
 
-Citation information will be added after peer review.
+If you find our library useful in your research, please consider citing us:
+
+'''
+@misc{luo2025sparseinputneuralnetworkusing,
+      title={Sparse-Input Neural Network using Group Concave Regularization}, 
+      author={Bin Luo and Susan Halabi},
+      year={2025},
+      eprint={2307.00344},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML},
+      url={https://arxiv.org/abs/2307.00344}, 
+}
+'''
