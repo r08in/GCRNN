@@ -1,6 +1,6 @@
 # GCRNet: Sparse-Input Neural Networks with Group Concave Regularization
 
-[Project Page](https://github.com/r08in/GCRNN)    [Paper](https://arxiv.org/abs/2307.00344)
+[Project Page](https://github.com/r08in/GCRNN)|[Paper](https://arxiv.org/abs/2307.00344)
 
 GCRNet is a Python library that implements a novel framework for sparse-input neural networks using group concave regularization. Leveraging the power of concave penalties, specifically MCP and SCAD, GCRNet provides a comprehensive approach for simultaneous feature selection and non-linear function estimation. The proposed framework considers all outgoing connections from a single input neuron as a group and applies an appropriate concave penalty to the $l_2$ norm of weights within each group. By selectively shrinking the weights of certain groups to exact zeros, GCRNet constructs a neural network that utilizes only a small subset of variables, enhancing both the accuracy and interpretability of the feature selection process. GCRNet offers versatile functionality, supporting regression or classification tasks with continuous, binary, or time-to-event outcomes.
 
@@ -46,7 +46,7 @@ Please see the examples in our Colab notebooks:
 
 ### Multivariate Survival Analysis Example
 
-[Project Page](https://github.com/r08in/GCRNN)    [Paper](https://www.mdpi.com/2306-5354/12/6/596)
+[Project Page](https://github.com/r08in/GCRNN)|[Paper](https://www.mdpi.com/2306-5354/12/6/596)
 
 We extend our framework to simultaneously select common variables and estimate models for multivariate failure time data. Our approach employs the penalized pseudo-partial likelihood method within a non-linear marginal hazard model. Specifically, each marginal hazard function is approximated by a feed-forward neural network with an identical input layer. We treat all outgoing connections from a single input neuron across feed-forward neural networks as a collective group and apply a concave penalty to the  $l_2$  norm of the weights within each group. By shrinking the weights of specific groups to exact zeros, our method yields a collection of neural networks that utilize only a concise subset of common variables. This group-level penalization facilitates the inclusion or exclusion of entire groups of parameters, enabling the identification of common variables relevant to multivariate failure time data.
 See the example in our Colab notebooks:
@@ -58,7 +58,7 @@ Some of our codebase and its structure are inspired by https://github.com/runopt
 
 If you find our library useful in your research, please consider citing us:
 
-'''
+```
 @misc{luo2025sparseinputneuralnetworkusing,
       title={Sparse-Input Neural Network using Group Concave Regularization}, 
       author={Bin Luo and Susan Halabi},
@@ -68,4 +68,4 @@ If you find our library useful in your research, please consider citing us:
       primaryClass={stat.ML},
       url={https://arxiv.org/abs/2307.00344}, 
 }
-'''
+```
